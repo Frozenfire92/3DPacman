@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum Direction
+public enum MovementDirection
 {
     None,
     Up,
@@ -12,7 +12,7 @@ public enum Direction
 
 public class Player : MonoBehaviour
 {
-    Direction nextMove;
+    MovementDirection nextMove;
     Rigidbody rb;
 
     public float speed = 1.0f;
@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        nextMove = Direction.None;
+        nextMove = MovementDirection.None;
     }
 
     void Start()
@@ -30,42 +30,48 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Up")) { nextMove = Direction.Up; }
-        if (Input.GetButtonDown("Down")) { nextMove = Direction.Down; }
-        if (Input.GetButtonDown("Left")) { nextMove = Direction.Left; }
-        if (Input.GetButtonDown("Right")) { nextMove = Direction.Right; }
+        if (Input.GetButtonDown("Up")) { nextMove = MovementDirection.Up; }
+        if (Input.GetButtonDown("Down")) { nextMove = MovementDirection.Down; }
+        if (Input.GetButtonDown("Left")) { nextMove = MovementDirection.Left; }
+        if (Input.GetButtonDown("Right")) { nextMove = MovementDirection.Right; }
     }
 
     void FixedUpdate()
     {
         switch (nextMove)
         {
-            case Direction.Up:
+            case MovementDirection.Up:
                 transform.Rotate(-90, 0, 0);
-                nextMove = Direction.None;
+                nextMove = MovementDirection.None;
                 applyRotationVelocity();
                 break;
-            case Direction.Down:
+            case MovementDirection.Down:
                 transform.Rotate(90, 0, 0);
-                nextMove = Direction.None;
+                nextMove = MovementDirection.None;
                 applyRotationVelocity();
                 break;
-            case Direction.Left:
+            case MovementDirection.Left:
                 transform.Rotate(0, -90, 0);
-                nextMove = Direction.None;
+                nextMove = MovementDirection.None;
                 applyRotationVelocity();
                 break;
-            case Direction.Right:
-                nextMove = Direction.None;
+            case MovementDirection.Right:
+                nextMove = MovementDirection.None;
                 transform.Rotate(0, 90, 0);
                 applyRotationVelocity();
                 break;
-            case Direction.None: break;
+            case MovementDirection.None: break;
         }
     }
 
     void applyRotationVelocity()
     {
+        // Snap to grid
+        transform.position = new Vector3(Mathf.RoundToInt(transform.position.x),
+                                         Mathf.RoundToInt(transform.position.y),
+                                         Mathf.RoundToInt(transform.position.z));
+
+        // Transform world to local, apply speed, and transform back again
         Vector3 locVel = transform.InverseTransformDirection(Vector3.zero);
         locVel.z = speed * Time.deltaTime;
         rb.velocity = transform.TransformDirection(locVel);
@@ -78,8 +84,9 @@ public class Player : MonoBehaviour
             GameController.instance.AddScore();
             Destroy(other.gameObject);
         }
-        else if (other.tag == "Enemy")
+        else if (other.tag == "Ghost")
         {
+            Debug.Log("You hit a ghost");
             //EXPLOSION
             //GAME OVER
             //SUCH LOSS
