@@ -31,7 +31,7 @@ public class Ghost : MonoBehaviour
     void Update()
     {
         //Decide if we want to change direction
-        if (Random.Range(0f,1f) >= 0.95) { currentDirection = (Direction3D)Random.Range(0, 6); }
+        if (Random.Range(0f,1f) >= 0.975) { currentDirection = (Direction3D)Random.Range(0, 6); }
 
         //Check for boundaries
         if (transform.position.x >= GameController.instance.maxPellet.x ||
